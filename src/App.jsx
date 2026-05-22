@@ -1,10 +1,30 @@
 import { Form } from "./components/Form";
 import "./App.css";
+import { useState } from "react";
 
 const App = () => {
+  const [taskList, setTaskList] = useState([]);
   const addTaskList = (taskObj) => {
-    console.log(taskObj);
+    const obj = {
+      ...taskObj,
+      id: randomIdGenerator(),
+      type: "entry",
+    };
+    setTaskList([...taskList, obj]);
   };
+  console.log(taskList);
+  const randomIdGenerator = (length = 6) => {
+    const str =
+      "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
+
+    let id = "";
+    for (let i = 0; i < 6; i++) {
+      const randomIndex = Math.floor(Math.random() * str.length); //0-61
+      id += str[randomIndex];
+    }
+    return id;
+  };
+
   return (
     <div className="wrapper pt-5">
       {/* <!-- title --> */}
