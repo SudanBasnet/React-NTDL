@@ -1,9 +1,14 @@
 import { Form } from "./components/Form";
 import "./App.css";
 import { useState } from "react";
+import { Table } from "./components/Table";
+const hrPerWeek = 24 * 7;
 
 const App = () => {
   const [taskList, setTaskList] = useState([]);
+  const ttlHr = taskList.reduce((acc, item) => {
+    return acc + Number(item.hr);
+  }, 0);
   const addTaskList = (taskObj) => {
     const obj = {
       ...taskObj,
@@ -11,8 +16,21 @@ const App = () => {
       type: "entry",
     };
     setTaskList([...taskList, obj]);
+    if (ttlHr + Number(taskObj.hr) > hrPerWeek) {
+      return alert("Sorry, Maximum hours reached for a week");
+    }
   };
-  console.log(taskList);
+
+  const switchTask = (id, type) => {
+    setTaskList(
+      taskList.map((item) => {
+        if (item.id === id) {
+          item.type = type;
+        }
+        return item;
+      }),
+    );
+  };
   const randomIdGenerator = (length = 6) => {
     const str =
       "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
@@ -25,6 +43,10 @@ const App = () => {
     return id;
   };
 
+  const handleOnDelete = (id) => {
+    if (window.confirm("are you sure,you want to delete this?"))
+      setTaskList(taskList.filter((item) => item.id !== id));
+  };
   return (
     <div className="wrapper pt-5">
       {/* <!-- title --> */}
@@ -35,29 +57,14 @@ const App = () => {
         <Form addTaskList={addTaskList} />
 
         {/* <!-- tables --> */}
-        <div className="row mt-5">
-          <div className="col-md">
-            <h3 className="text-center">Entry List</h3>
-            <hr />
-            {/* <!-- entry list tables --> */}
-            <table className="table table-striped table-hover border">
-              <tbody id="entryList"></tbody>
-            </table>
-          </div>
-          <div className="col-md">
-            <h3 className="text-center">Bad List</h3>
-            <hr />
-            {/* <!-- bad list tables --> */}
-            <table className="table table-striped table-hover border">
-              <tbody id="badList"></tbody>
-            </table>
-            <div className="alert alert-success">
-              You could have saved = <span id="savedhrsElm"></span>hr
-            </div>
-          </div>
-        </div>
+        <Table
+          taskList={taskList}
+          switchTask={switchTask}
+          handleOnDelete={handleOnDelete}
+        />
+
         <div className="alert alert-success">
-          Total Hours allocated = <span id="ttlhrs">0</span>hrs
+          Total Hours allocated = <span id="ttlhrs">{ttlHr}</span>hrs
         </div>
       </div>
     </div>
