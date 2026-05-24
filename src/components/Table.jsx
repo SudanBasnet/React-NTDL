@@ -1,22 +1,62 @@
-import React from "react";
+import { useState } from "react";
 
 export const Table = ({ taskList, switchTask, handleOnDelete }) => {
+  const [toDelete, setToDelete] = useState([]);
   const entryList = taskList.filter((item) => item.type === "entry");
   const badList = taskList.filter((item) => item.type === "bad");
+  const handleOnSelect = (e) => {
+    const { checked, value } = e.target;
+    if (checked) {
+      if (value === "allEntry") {
+        //get all ids from entry list
+        const _ids = entryList.map((item) => item._id);
+        setToDelete([...toDelete, ..._ids]);
+        return;
+      }
+      setToDelete([...toDelete, value]);
+    } else {
+      if (value === "allEntry") {
+        const _ids = entryList.map((item) => item._id);
 
+        setToDelete(toDelete.filter((_id) => !_ids.includes(_id)));
+        return;
+      }
+
+      setToDelete(toDelete.filter((_id) => _id !== value));
+    }
+    console.log(checked, value);
+  };
+  console.log(toDelete);
   return (
     <div className="row mt-5">
       <div className="col-md">
         <h3 className="text-center">Entry List</h3>
         <hr />
         {/* <!-- entry list tables --> */}
+        <input
+          className="form-check-input"
+          type="checkbox"
+          value="allEntry"
+          id="all-entry"
+          onChange={handleOnSelect}
+        />{" "}
+        <label htmlFor="all-entry">Select All</label>
         <table className="table table-striped table-hover border">
           <tbody id="entryList">
             {entryList.map((item, i) => {
               return (
                 <tr key={item._id}>
                   <td>{i + 1}</td>
-                  <td>{item.task}</td>
+                  <td>
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value={item?._id}
+                      onChange={handleOnSelect}
+                      checked={toDelete.includes(item?._id)}
+                    />{" "}
+                    {item.task}
+                  </td>
                   <td>{item.hr}</td>
                   <td className="text-end">
                     <button
@@ -42,12 +82,29 @@ export const Table = ({ taskList, switchTask, handleOnDelete }) => {
         <h3 className="text-center">Bad List</h3>
         <hr />
         {/* <!-- bad list tables --> */}
+        <input
+          className="form-check-input"
+          type="checkbox"
+          value="allBad"
+          id="all-bad"
+          onChange={handleOnSelect}
+        />{" "}
+        <label htmlFor="all-bad">Select All</label>
         <table className="table table-striped table-hover border">
           <tbody id="badList">
             {badList.map((item, i) => (
-              <tr key={item.id}>
+              <tr key={item._id}>
                 <td>{i + 1}</td>
-                <td>{item.task}</td>
+
+                <td>
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    value={item?._id}
+                    onChange={handleOnSelect}
+                  />{" "}
+                  {item.task}
+                </td>
                 <td>{item.hr}</td>
                 <td className="text-end">
                   <button
