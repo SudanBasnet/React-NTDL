@@ -1,13 +1,14 @@
 import { Form } from "./components/Form";
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Table } from "./components/Table";
-import { fetchAllTasks, postTask } from "./helpers/axiosHelper";
+import { fetchAllTasks, postTask, updateTasks } from "./helpers/axiosHelper";
 const hrPerWeek = 24 * 7;
 
 const App = () => {
   const [taskList, setTaskList] = useState([]);
   const [resp, setResp] = useState({});
+  const shouldFetchRef = useRef(true);
   const ttlHr = taskList.reduce((acc, item) => {
     return acc + Number(item.hr);
   }, 0);
@@ -19,28 +20,31 @@ const App = () => {
     //mount to our tasklist
     data?.status === "success" && setTaskList(data.tasks);
   };
+  useEffect(() => {
+    //
+    shouldFetchRef.current && getAllTasks();
+    shouldFetchRef.current = false;
+  }, []);
 
   const addTaskList = async (taskObj) => {
     const response = await postTask(taskObj);
     setResp(response);
   };
-  useEffect(() => {
-    //
-    getAllTasks();
-  }, []);
 
-  const switchTask = (id, type) => {
-    setTaskList(
-      taskList.map((item) => {
-        if (item.id === id) {
-          return {
-            ...item,
-            type,
-          };
-        }
-        return item;
-      }),
-    );
+  const switchTask = async (_id, type) => {
+    // setTaskList(
+    //   taskList.map((item) => {
+    //     if (item.id === id) {
+    //       return {
+    //         ...item,
+    //         type,
+    //       };
+    //     }
+    //     return item;
+    //   }),
+    // );
+    const response = await updateTasks({ _id, type });
+    setResp(response);
   };
   const randomIdGenerator = (length = 6) => {
     const str =
