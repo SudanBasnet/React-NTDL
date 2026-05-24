@@ -16,7 +16,7 @@ const App = () => {
   const getAllTasks = async () => {
     //call axioshelp for get data
     const data = await fetchAllTasks();
-    console.log(data);
+
     //mount to our tasklist
     data?.status === "success" && setTaskList(data.tasks);
   };
@@ -29,33 +29,19 @@ const App = () => {
   const addTaskList = async (taskObj) => {
     const response = await postTask(taskObj);
     setResp(response);
+    if (response.status === "success") {
+      //refetch all tasks
+      getAllTasks();
+    }
   };
 
   const switchTask = async (_id, type) => {
-    // setTaskList(
-    //   taskList.map((item) => {
-    //     if (item.id === id) {
-    //       return {
-    //         ...item,
-    //         type,
-    //       };
-    //     }
-    //     return item;
-    //   }),
-    // );
     const response = await updateTasks({ _id, type });
     setResp(response);
-  };
-  const randomIdGenerator = (length = 6) => {
-    const str =
-      "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
-
-    let id = "";
-    for (let i = 0; i < 6; i++) {
-      const randomIndex = Math.floor(Math.random() * str.length); //0-61
-      id += str[randomIndex];
+    if (response.status === "success") {
+      //refetch all tasks
+      getAllTasks();
     }
-    return id;
   };
 
   const handleOnDelete = (id) => {
