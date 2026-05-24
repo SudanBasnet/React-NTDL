@@ -20,7 +20,6 @@ export const Form = ({ addTaskList }) => {
     <div>
       <form
         onSubmit={handleOnSubmit}
-        action="javascript:void(0)"
         className="border p-5 rounded shadow mt-5"
       >
         <div className="row g-2">
