@@ -35,6 +35,9 @@ const App = () => {
   }, []);
 
   const addTaskList = async (taskObj) => {
+    if (ttlHr + Number(taskObj.hr) > hrPerWeek) {
+      return alert("Sorry not enough time to fit in the total hours you want");
+    }
     const response = await postTask(taskObj);
     console.log(response);
     setResp(response);

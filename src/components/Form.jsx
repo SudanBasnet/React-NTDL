@@ -31,6 +31,7 @@ export const Form = ({ addTaskList }) => {
               aria-label="First name"
               name="task"
               onChange={handleOnChange}
+              required
             />
           </div>
           <div className="col-md-2">
@@ -41,7 +42,9 @@ export const Form = ({ addTaskList }) => {
               aria-label="Last name"
               name="hr"
               min="1"
+              max="100"
               onChange={handleOnChange}
+              required
             />
           </div>
           <div className="col-md-3 d-grid">
