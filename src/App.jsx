@@ -2,7 +2,12 @@ import { Form } from "./components/Form";
 import "./App.css";
 import { useEffect, useRef, useState } from "react";
 import { Table } from "./components/Table";
-import { fetchAllTasks, postTask, updateTasks } from "./helpers/axiosHelper";
+import {
+  deleteTasks,
+  fetchAllTasks,
+  postTask,
+  updateTasks,
+} from "./helpers/axiosHelper";
 const hrPerWeek = 24 * 7;
 
 const App = () => {
@@ -20,6 +25,9 @@ const App = () => {
     //mount to our tasklist
     data?.status === "success" && setTaskList(data.tasks);
   };
+  const [toDelete, setToDelete] = useState([]);
+  const entryList = taskList.filter((item) => item.type === "entry");
+  const badList = taskList.filter((item) => item.type === "bad");
   useEffect(() => {
     //
     shouldFetchRef.current && getAllTasks();
@@ -28,6 +36,7 @@ const App = () => {
 
   const addTaskList = async (taskObj) => {
     const response = await postTask(taskObj);
+    console.log(response);
     setResp(response);
     if (response.status === "success") {
       //refetch all tasks
@@ -44,11 +53,48 @@ const App = () => {
     }
   };
 
-  const handleOnDelete = (id) => {
-    if (window.confirm("are you sure,you want to delete this?"))
-      setTaskList(taskList.filter((item) => item.id !== id));
+  const handleOnDelete = async (idsToDelete) => {
+    if (window.confirm("are you sure,you want to delete this?")) {
+      const response = await deleteTasks(idsToDelete);
+      setResp(response);
+      if (response.status === "success") {
+        //refetch all tasks
+        getAllTasks();
+      }
+    }
   };
+  const handleOnSelect = (e) => {
+    const { checked, value } = e.target;
 
+    let tempArg = [];
+    if (value === "allEntry") {
+      tempArg = entryList;
+    }
+    if (value === "allBad") {
+      tempArg = badList;
+    }
+    if (checked) {
+      if (value === "allEntry" || value === "allBad") {
+        //get all ids from entry list
+        const _ids = tempArg.map((item) => item._id);
+        const uniqueIds = [...new Set([...toDelete, ..._ids])];
+        setToDelete(uniqueIds);
+        return;
+      }
+      setToDelete([...toDelete, value]);
+    } else {
+      if (value === "allEntry" || value === "allBad") {
+        const _ids = tempArg.map((item) => item._id);
+
+        setToDelete(toDelete.filter((_id) => !_ids.includes(_id)));
+        return;
+      }
+
+      setToDelete(toDelete.filter((_id) => _id !== value));
+    }
+    console.log(checked, value);
+  };
+  console.log(toDelete);
   return (
     <div className="wrapper pt-5">
       {/* <!-- title --> */}
@@ -74,6 +120,10 @@ const App = () => {
           taskList={taskList}
           switchTask={switchTask}
           handleOnDelete={handleOnDelete}
+          toDelete={toDelete}
+          handleOnSelect={handleOnSelect}
+          entryList={entryList}
+          badList={badList}
         />
 
         <div className="alert alert-success">

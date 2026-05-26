@@ -39,3 +39,10 @@ export const updateTasks = async (data) => {
   };
   return apiProcessor(obj);
 };
+export const deleteTasks = async (data) => {
+  const obj = {
+    method: "delete",
+    data,
+  };
+  return apiProcessor(obj);
+};
